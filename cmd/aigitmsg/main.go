@@ -105,6 +105,9 @@ func buildPrompt(gitDiff, gitBranch, gitTemplate string) string {
 `
 	}
 
+	prompt += `Here are some details about the changes you are committing:
+`
+
 	if gitBranch != "" {
 		prompt += `
 The branch name is ` + gitBranch
