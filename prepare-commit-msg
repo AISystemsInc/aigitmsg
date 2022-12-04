@@ -1,0 +1,23 @@
+#!/bin/bash
+
+# Prepare-commit-msg hook
+#
+# This hook is called with the following parameters:
+#
+# $1 - Path to the msg file
+# $2 - Source of the commit
+# $3 - SHA1 of the commit
+
+COMMIT_MSG_FILE=$1
+COMMIT_SOURCE=$2
+SHA1=$3
+
+# Get the GPT API Key as an environment variable
+GPT_API_KEY=$(echo $GPT_API_KEY)
+if [ -z "$GPT_API_KEY" ]; then
+  echo "GPT API key is required"
+  exit 1
+fi
+
+# Call the aigptmsg binary with the GPT API Key as an argument
+aigptmsg --gpt-key $GPT_API_KEY > $COMMIT_MSG_FILE
