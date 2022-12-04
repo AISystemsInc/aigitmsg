@@ -115,7 +115,7 @@ The branch name is ` + gitBranch
 
 	if gitDiff != "" {
 		prompt += `
-This is the git diff:
+The result of the git diff command is:
 
 ` + gitDiff
 	}
