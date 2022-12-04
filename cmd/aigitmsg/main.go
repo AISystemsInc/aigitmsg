@@ -93,28 +93,21 @@ func main() {
 }
 
 func buildPrompt(gitDiff, gitBranch, gitTemplate string) string {
-	var prompt = `write a git commit message using the following template:
+	var prompt = `Write a git commit message using the following rules:
 
 `
 
 	if gitTemplate != "" {
 		prompt += gitTemplate
 	} else {
-		prompt += `[Action]: [Summary of the most significant change]
+		prompt += `The first line should start with an imperative word (e.g. Add, Remove, Refactor, etc.) followed by a colon and then be followed by a summary of the changes. A blank line should be next. The 3rd line should contain either a bulleted list of changes made or a more detail description of the changes as a whole.
 
-[bullet list of diff Highlights]
-
-[if branch name has ticket number, display it, otherwise leave blank]
-
-[Action] is an imperative word like Add, Remove, Delete, Fix, Refactor, Update, etc.
-[Summary] is a short description of the most significant change.
-[diff Highlights] is a list of the most significant changes in the diff.
 `
 	}
 
 	if gitBranch != "" {
 		prompt += `
-The name of the branch is ` + gitBranch
+The branch name is ` + gitBranch
 	}
 
 	if gitDiff != "" {
