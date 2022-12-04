@@ -100,11 +100,15 @@ func buildPrompt(gitDiff, gitBranch, gitTemplate string) string {
 	if gitTemplate != "" {
 		prompt += gitTemplate
 	} else {
-		prompt += `[Action]: [Summary]
+		prompt += `[Action]: [Summary of the most significant change]
 
 [bullet list of diff Highlights]
 
 [if branch name has ticket number, display it, otherwise leave blank]
+
+[Action] is an imperative word like Add, Remove, Delete, Fix, Refactor, Update, etc.
+[Summary] is a short description of the most significant change.
+[diff Highlights] is a list of the most significant changes in the diff.
 `
 	}
 
