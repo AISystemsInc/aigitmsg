@@ -72,6 +72,8 @@ func main() {
 
 	prompt := buildPrompt(gitDiff, gitBranch, gitTemplate)
 
+	log.Println(prompt)
+
 	req := gogpt.CompletionRequest{
 		Model:       "text-davinci-003",
 		MaxTokens:   500,
