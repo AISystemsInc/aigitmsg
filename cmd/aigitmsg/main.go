@@ -117,8 +117,9 @@ The branch name is ` + gitBranch
 	}
 
 	if len(prompt)+len(gitDiff) > maxAllowedTokens {
-		log.Printf("prompt is too long, truncating to %d characters", maxAllowedTokens-len(gitDiff))
-		gitDiff = gitDiff[:maxAllowedTokens-len(prompt)]
+		charactersToRemove := len(prompt) + len(gitDiff) - maxAllowedTokens
+		log.Printf("prompt is too long, truncating by %d characters", charactersToRemove)
+		gitDiff = gitDiff[:charactersToRemove]
 	}
 
 	if gitDiff != "" {
@@ -129,7 +130,9 @@ The result of the git diff command is:
 	}
 
 	prompt += `
-Primarily consider lines that start with a + sign.`
+Focus mainly on lines that start with a + sign. All other lines are only for context.
+
+`
 
 	return prompt
 }
