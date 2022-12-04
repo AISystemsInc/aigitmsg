@@ -1,6 +1,12 @@
 # aigitmsg (AI Git Message)
 
-A tool to help you write a meaningful git commit message.
+`aigitmsg` is a command line tool that helps you write meaningful commit messages.
+
+## How it works
+
+It works by taking in the output of the `git diff` command, the branch name, and an optional commit template,
+and then using the GPT-3 API to generate a meaningful commit message. The commit message will follow the rules you
+specified in the commit template or, if no template was provided, the default commit message format.
 
 ## Installation
 
@@ -10,16 +16,8 @@ $ go install github.com/AISystemsInc/aigitmsg/aigitmsg@latest
 
 ## Usage
 
-1. Run `aigitmsg -gpt-key <api-key>`
-2. Enter the git diff output, branch name, and template (optional)
-3. Receive a meaningful commit message
-
-## Description
-
-`aigitmsg` is a command line tool that helps you write meaningful commit messages. 
-It does this by taking in the output of the `git diff` command, the branch name, and an optional commit template, 
-and then using the GPT-3 API to generate a meaningful commit message. The commit message will follow the rules you 
-specified in the commit template or, if no template was provided, the default commit message format.
+1. Run `aigitmsg -gpt-key <api-key>` from the root of a git repository
+2. Receive a meaningful commit message
 
 ## Getting a GPT-3 API Key
 
