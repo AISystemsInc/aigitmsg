@@ -73,9 +73,10 @@ func main() {
 	prompt := buildPrompt(gitDiff, gitBranch, gitTemplate)
 
 	req := gogpt.CompletionRequest{
-		Model:     "text-davinci-003",
-		MaxTokens: 500,
-		Prompt:    prompt,
+		Model:       "text-davinci-003",
+		MaxTokens:   500,
+		Prompt:      prompt,
+		Temperature: 0.7,
 	}
 
 	c := gogpt.NewClient(*gptAPIKey)
@@ -88,16 +89,23 @@ func main() {
 		log.Fatal(err)
 	}
 
-	fmt.Println(resp.Choices[0].Text)
+	fmt.Println(strings.TrimSpace(resp.Choices[0].Text))
 }
 
 func buildPrompt(gitDiff, gitBranch, gitTemplate string) string {
-	var prompt = `Please write a commit message using the following template:
+	var prompt = `Please write a git commit message using the following template:
 
 `
 
 	if gitTemplate != "" {
 		prompt += gitTemplate
+	} else {
+		prompt += `[Action]: [Summary]
+
+[bullet list of diff Highlights]
+
+[if branch name has ticket number, display it, otherwise leave blank]
+`
 	}
 
 	if gitBranch != "" {
@@ -111,6 +119,9 @@ Given the following diff:
 
 ` + gitDiff
 	}
+
+	prompt += `
+Primarily consider lines that start with a + sign.`
 
 	return prompt
 }
