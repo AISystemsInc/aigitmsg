@@ -2,6 +2,12 @@
 
 A tool to help you write a meaningful git commit message.
 
+## Installation
+
+```bash
+$ go install github.com/AISystemsInc/aigitmsg/aigitmsg@latest
+```
+
 ## Usage
 
 1. Run `aigitmsg -gpt-key <api-key>`
