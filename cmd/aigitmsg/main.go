@@ -15,7 +15,7 @@ import (
 )
 
 func getGitDiff() (string, error) {
-	out, err := exec.Command("git", "diff", "--cached").Output()
+	out, err := exec.Command("git", "diff", "--cached", "--no-prefix", "-U20").Output()
 	if err != nil {
 		return "", err
 	}
