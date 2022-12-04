@@ -15,7 +15,7 @@ import (
 )
 
 func getGitDiff() (string, error) {
-	out, err := exec.Command("git", "diff").Output()
+	out, err := exec.Command("git", "diff", "--cached").Output()
 	if err != nil {
 		return "", err
 	}
@@ -72,8 +72,6 @@ func main() {
 
 	prompt := buildPrompt(gitDiff, gitBranch, gitTemplate)
 
-	log.Println(prompt)
-
 	req := gogpt.CompletionRequest{
 		Model:       "text-davinci-003",
 		MaxTokens:   500,
@@ -95,7 +93,7 @@ func main() {
 }
 
 func buildPrompt(gitDiff, gitBranch, gitTemplate string) string {
-	var prompt = `Please write a git commit message using the following template:
+	var prompt = `write a git commit message using the following template:
 
 `
 
@@ -116,12 +114,12 @@ func buildPrompt(gitDiff, gitBranch, gitTemplate string) string {
 
 	if gitBranch != "" {
 		prompt += `
-Given the name of the branch is ` + gitBranch
+The name of the branch is ` + gitBranch
 	}
 
 	if gitDiff != "" {
 		prompt += `
-Given the following diff:
+This is the git diff:
 
 ` + gitDiff
 	}
