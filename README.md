@@ -16,7 +16,8 @@ go install github.com/AISystemsInc/aigitmsg/aigitmsg@v0.1.0
 
 ## Usage
 
-1. Run `aigitmsg -gpt-key <api-key>` from the root of a git repository
+1. Run `aigitmsg -gpt-key <api-key>` from the root of your repository
+   - If you configure the `GPT_API_KEY` environment variable, you can omit the `-gpt-key` flag
 2. Receive a meaningful commit message
 
 ## Getting a GPT-3 API Key
@@ -35,4 +36,4 @@ saved in your `PATH` environment variable.
 You can then copy this hook [prepare-commit-msg](./prepare-commit-msg) to the `.git/hooks` directory of the repository
 you want to use it in. You will need to make sure the hook is executable by running `chmod +x .git/hooks/prepare-commit-msg`.
 
-Be sure to export the env variable `GPT_API_KEY` with your GPT-3 API key or you can modify the hook to add the key.
+Be sure to export the env variable `GPT_API_KEY` with your GPT-3 API key, or you can modify the hook to add the key.
