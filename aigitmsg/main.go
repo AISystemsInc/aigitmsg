@@ -4,7 +4,6 @@ import (
 	"context"
 	"flag"
 	"fmt"
-	"io/ioutil"
 	"log"
 	"os"
 	"os/exec"
@@ -33,17 +32,19 @@ func getGitBranch() (string, error) {
 func getGitTemplate() (string, error) {
 	out, err := exec.Command("git", "config", "--get", "commit.template").Output()
 	if err != nil {
-		log.Printf("could not get git commit template: %s", err)
 		return "", nil
 	}
+
 	filename := strings.TrimSpace(string(out))
 	if filename == "" {
 		return "", nil
 	}
-	templateBytes, err := ioutil.ReadFile(filename)
+
+	templateBytes, err := os.ReadFile(filename)
 	if err != nil {
 		return "", fmt.Errorf("failed to read git template file: %s", err)
 	}
+
 	return string(templateBytes), nil
 }
 
@@ -54,10 +55,12 @@ const maxPromptLength = maxAllowedTokens * 4
 func main() {
 	gptAPIKey := flag.String("gpt-key", os.Getenv("GPT_API_KEY"), "GPT API Key")
 	onlyShowPrompt := flag.String("only-prompt", "false", "When set, only show the prompt and exit")
+	gitMessageTemplate := flag.String("git-message-template", "", "Git commit message template")
+
 	flag.Parse()
 
 	if *gptAPIKey == "" {
-		fmt.Println("GPT API key is required")
+		fmt.Println("-gpt-key or GPT_API_KEY environment variable is required")
 		return
 	}
 
@@ -71,9 +74,13 @@ func main() {
 		log.Fatalf("%s", err)
 	}
 
-	gitTemplate, err := getGitTemplate()
-	if err != nil {
-		log.Fatal(err)
+	gitTemplate := *gitMessageTemplate
+
+	if gitTemplate == "" {
+		gitTemplate, err = getGitTemplate()
+		if err != nil {
+			log.Fatalf("%s", err)
+		}
 	}
 
 	prompt := buildPrompt(gitDiff, gitBranch, gitTemplate)
