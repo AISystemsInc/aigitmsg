@@ -11,7 +11,7 @@ specified in the commit template or, if no template was provided, the default co
 ## Installation
 
 ```bash
-go install github.com/AISystemsInc/aigitmsg/aigitmsg@v0.1.0
+go install github.com/AISystemsInc/aigitmsg/aigitmsg@v0.1.1
 ```
 
 ## Usage
