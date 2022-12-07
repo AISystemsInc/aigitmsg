@@ -10,6 +10,10 @@ specified in the commit template or, if no template was provided, the default co
 
 ## Installation
 
+Install from one of the pre-built binaries from the [releases page](https://github.com/AISystemsInc/aigitmsg/releases).
+
+Or, if you have Go installed, you can install from source:
+
 ```bash
 go install github.com/AISystemsInc/aigitmsg/aigitmsg@v0.1.1
 ```
