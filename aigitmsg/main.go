@@ -54,10 +54,16 @@ const maxPromptLength = maxAllowedTokens * 4
 
 func main() {
 	gptAPIKey := flag.String("gpt-key", os.Getenv("GPT_API_KEY"), "GPT API Key")
-	onlyShowPrompt := flag.String("only-prompt", "false", "When set, only show the prompt and exit")
+	onlyShowPrompt := flag.Bool("only-prompt", false, "When set, only show the prompt and exit")
 	gitMessageTemplate := flag.String("git-message-template", "", "Git commit message template")
+	version := flag.Bool("version", false, "Print version and exit")
 
 	flag.Parse()
+
+	if *version {
+		fmt.Println("aigitmsg v0.1.1")
+		return
+	}
 
 	if *gptAPIKey == "" {
 		fmt.Println("-gpt-key or GPT_API_KEY environment variable is required")
@@ -85,7 +91,7 @@ func main() {
 
 	prompt := buildPrompt(gitDiff, gitBranch, gitTemplate)
 
-	if *onlyShowPrompt != "false" {
+	if *onlyShowPrompt {
 		fmt.Println(prompt)
 		return
 	}
