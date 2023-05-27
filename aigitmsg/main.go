@@ -10,7 +10,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/sashabaranov/go-gpt3"
+	gogpt "github.com/sashabaranov/go-openai"
 )
 
 func getGitDiff() (string, error) {
@@ -52,13 +52,29 @@ const maxCompletionTokens = 500
 const maxAllowedTokens = 1024
 const maxPromptLength = maxAllowedTokens * 4
 
+var modelToApi = map[string]string{
+	"text-davinci-003": "completion",
+	"gpt-3.5-turbo":    "chat",
+	"gpt-4":            "chat",
+}
+
 func main() {
-	gptAPIKey := flag.String("gpt-key", os.Getenv("GPT_API_KEY"), "GPT API Key")
+	gptAPIKey := flag.String("gpt-key", os.Getenv("OPENAI_API_KEY"), "OPENAI API Key")
 	onlyShowPrompt := flag.Bool("only-prompt", false, "When set, only show the prompt and exit")
 	gitMessageTemplate := flag.String("git-message-template", "", "Git commit message template")
 	version := flag.Bool("version", false, "Print version and exit")
+	model := flag.String("model", "gpt-3.5-turbo", "model to use")
 
 	flag.Parse()
+
+	apiMethod := "completion"
+
+	if modelToApi[*model] != "" {
+		apiMethod = modelToApi[*model]
+	} else {
+		fmt.Printf("Unknown model: %s\n", *model)
+		os.Exit(1)
+	}
 
 	if *version {
 		fmt.Println("aigitmsg v0.1.1")
@@ -66,13 +82,18 @@ func main() {
 	}
 
 	if *gptAPIKey == "" {
-		fmt.Println("-gpt-key or GPT_API_KEY environment variable is required")
+		fmt.Println("-gpt-key or OPENAI_API_KEY environment variable is required")
 		return
 	}
 
 	gitDiff, err := getGitDiff()
 	if err != nil {
 		log.Fatalf("%s", err)
+	}
+
+	if len(gitDiff) == 0 {
+		fmt.Println("No changes to commit")
+		os.Exit(1)
 	}
 
 	gitBranch, err := getGitBranch()
@@ -96,24 +117,45 @@ func main() {
 		return
 	}
 
-	req := gogpt.CompletionRequest{
-		Model:       "text-davinci-003",
-		MaxTokens:   maxCompletionTokens,
-		Prompt:      prompt,
-		Temperature: 0.9,
-	}
-
 	c := gogpt.NewClient(*gptAPIKey)
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*30)
 
 	defer cancel()
 
-	resp, err := c.CreateCompletion(ctx, req)
-	if err != nil {
-		log.Fatal(err)
-	}
+	if apiMethod == "chat" {
+		req := gogpt.ChatCompletionRequest{
+			Model:     *model,
+			MaxTokens: maxCompletionTokens,
+			Messages: []gogpt.ChatCompletionMessage{
+				{
+					Role:    "system",
+					Content: prompt,
+				},
+			},
+			Temperature: 0.9,
+		}
 
-	fmt.Println(strings.TrimSpace(resp.Choices[0].Text))
+		resp, err := c.CreateChatCompletion(ctx, req)
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		fmt.Println(strings.TrimSpace(resp.Choices[0].Message.Content))
+	} else if apiMethod == "completion" {
+		req := gogpt.CompletionRequest{
+			Model:       *model,
+			MaxTokens:   maxCompletionTokens,
+			Prompt:      prompt,
+			Temperature: 0.9,
+		}
+
+		resp, err := c.CreateCompletion(ctx, req)
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		fmt.Println(strings.TrimSpace(resp.Choices[0].Text))
+	}
 }
 
 func buildPrompt(gitDiff, gitBranch, gitTemplate string) string {
