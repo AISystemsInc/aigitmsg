@@ -10,7 +10,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/sashabaranov/go-gpt3"
+	gogpt "github.com/sashabaranov/go-gpt3"
 )
 
 func getGitDiff() (string, error) {
@@ -53,7 +53,7 @@ const maxAllowedTokens = 1024
 const maxPromptLength = maxAllowedTokens * 4
 
 func main() {
-	gptAPIKey := flag.String("gpt-key", os.Getenv("GPT_API_KEY"), "GPT API Key")
+	gptAPIKey := flag.String("gpt-key", os.Getenv("OPENAI_API_KEY"), "OPENAI API Key")
 	onlyShowPrompt := flag.Bool("only-prompt", false, "When set, only show the prompt and exit")
 	gitMessageTemplate := flag.String("git-message-template", "", "Git commit message template")
 	version := flag.Bool("version", false, "Print version and exit")
@@ -66,13 +66,18 @@ func main() {
 	}
 
 	if *gptAPIKey == "" {
-		fmt.Println("-gpt-key or GPT_API_KEY environment variable is required")
+		fmt.Println("-gpt-key or OPENAI_API_KEY environment variable is required")
 		return
 	}
 
 	gitDiff, err := getGitDiff()
 	if err != nil {
 		log.Fatalf("%s", err)
+	}
+
+	if len(gitDiff) == 0 {
+		fmt.Println("No changes to commit")
+		os.Exit(1)
 	}
 
 	gitBranch, err := getGitBranch()
