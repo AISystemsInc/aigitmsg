@@ -77,7 +77,7 @@ func main() {
 	}
 
 	if *version {
-		fmt.Println("aigitmsg v0.1.1")
+		fmt.Println("aigitmsg v0.1.2")
 		return
 	}
 
