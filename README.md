@@ -15,7 +15,7 @@ Install from one of the pre-built binaries from the [releases page](https://gith
 Or, if you have Go installed, you can install from source:
 
 ```bash
-go install github.com/AISystemsInc/aigitmsg/aigitmsg@v0.1.1
+go install github.com/AISystemsInc/aigitmsg/aigitmsg@v0.1.2
 ```
 
 ## Usage
