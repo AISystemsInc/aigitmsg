@@ -24,6 +24,13 @@ go install github.com/AISystemsInc/aigitmsg/aigitmsg@v0.1.1
    - If you configure the `OPENAI_API_KEY` environment variable, you can omit the `-gpt-key` flag
 2. Receive a meaningful commit message
 
+You can optionally set the `-model <model>` flag to use more capable models.
+
+Valid models are:
+ - `gpt-3.5-turbo` **default**
+ - `text-davinci-003`
+ - `gpt-4`
+
 ## Getting a GPT-3 API Key
 
 In order to use the aigitmsg tool, you will need to obtain a GPT-3 API key. You can get your API key by signing up 

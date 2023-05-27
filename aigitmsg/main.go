@@ -63,7 +63,7 @@ func main() {
 	onlyShowPrompt := flag.Bool("only-prompt", false, "When set, only show the prompt and exit")
 	gitMessageTemplate := flag.String("git-message-template", "", "Git commit message template")
 	version := flag.Bool("version", false, "Print version and exit")
-	model := flag.String("model", "text-davinci-003", "model to use")
+	model := flag.String("model", "gpt-3.5-turbo", "model to use")
 
 	flag.Parse()
 
