@@ -53,9 +53,24 @@ const maxAllowedTokens = 1024
 const maxPromptLength = maxAllowedTokens * 4
 
 var modelToApi = map[string]string{
-	"text-davinci-003": "completion",
-	"gpt-3.5-turbo":    "chat",
-	"gpt-4":            "chat",
+	"text-davinci-003":       "completion",
+	"text-davinci-002":       "completion",
+	"text-davinci-001":       "completion",
+	"text-curie-001":         "completion",
+	"text-babbage-001":       "completion",
+	"text-ada-001":           "completion",
+	"davinci":                "completion",
+	"curie":                  "completion",
+	"babbage":                "completion",
+	"ada":                    "completion",
+	"gpt-4":                  "chat",
+	"gpt-4-0613":             "chat",
+	"gpt-4-32k":              "chat",
+	"gpt-4-32k-0613":         "chat",
+	"gpt-3.5-turbo":          "chat",
+	"gpt-3.5-turbo-0613":     "chat",
+	"gpt-3.5-turbo-16k":      "chat",
+	"gpt-3.5-turbo-16k-0613": "chat",
 }
 
 func main() {
@@ -77,7 +92,7 @@ func main() {
 	}
 
 	if *version {
-		fmt.Println("aigitmsg v0.1.2")
+		fmt.Println("aigitmsg v0.1.3")
 		return
 	}
 
