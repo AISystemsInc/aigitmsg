@@ -27,9 +27,24 @@ go install github.com/AISystemsInc/aigitmsg/aigitmsg@v0.1.3
 You can optionally set the `-model <model>` flag to use more capable models.
 
 Valid models are:
- - `gpt-3.5-turbo` **default**
  - `text-davinci-003`
+ - `text-davinci-002`
+ - `text-davinci-001`
+ - `text-curie-001`
+ - `text-babbage-001`
+ - `text-ada-001`
+ - `davinci`
+ - `curie`
+ - `babbage`
+ - `ada`
  - `gpt-4`
+ - `gpt-4-0613`
+ - `gpt-4-32k`
+ - `gpt-4-32k-0613`
+ - `gpt-3.5-turbo` **default**
+ - `gpt-3.5-turbo-0613`
+ - `gpt-3.5-turbo-16k`
+ - `gpt-3.5-turbo-16k-0613`
 
 ## Getting a GPT-3 API Key
 
