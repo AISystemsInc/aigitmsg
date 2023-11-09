@@ -5,8 +5,8 @@
 ## How it works
 
 It works by taking in the output of the `git diff` command, the branch name, and an optional commit template,
-and then using the GPT-3 API to generate a meaningful commit message. The commit message will follow the rules you
-specified in the commit template or, if no template was provided, the default commit message format.
+and then using the OpenAI API to generate a meaningful commit message. The commit message will follow the rules you
+specified in the commit template or, if no template is configured, the default commit message format.
 
 ## Installation
 
@@ -15,7 +15,7 @@ Install from one of the pre-built binaries from the [releases page](https://gith
 Or, if you have Go installed, you can install from source:
 
 ```bash
-go install github.com/AISystemsInc/aigitmsg/aigitmsg@v0.1.3
+go install github.com/AISystemsInc/aigitmsg/aigitmsg@latest
 ```
 
 ## Usage
@@ -38,10 +38,12 @@ Valid models are:
  - `babbage`
  - `ada`
  - `gpt-4`
+ - `gpt-4-1106-preview`
  - `gpt-4-0613`
  - `gpt-4-32k`
  - `gpt-4-32k-0613`
- - `gpt-3.5-turbo` **default**
+ - `gpt-3.5-turbo-1106` **default**
+ - `gpt-3.5-turbo`
  - `gpt-3.5-turbo-0613`
  - `gpt-3.5-turbo-16k`
  - `gpt-3.5-turbo-16k-0613`

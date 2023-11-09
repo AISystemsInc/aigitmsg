@@ -13,8 +13,8 @@ import (
 	gogpt "github.com/sashabaranov/go-openai"
 )
 
-func getGitDiff() (string, error) {
-	out, err := exec.Command("git", "diff", "--cached", "--no-prefix", "-U0").Output()
+func getGitDiff(contextLines int) (string, error) {
+	out, err := exec.Command("git", "diff", "--cached", "--no-prefix", fmt.Sprintf("-U%d", contextLines)).Output()
 	if err != nil {
 		return "", fmt.Errorf("git diff failed: %s", err)
 	}
@@ -49,7 +49,7 @@ func getGitTemplate() (string, error) {
 }
 
 const maxCompletionTokens = 500
-const maxAllowedTokens = 1024
+const maxAllowedTokens = 4096
 const maxPromptLength = maxAllowedTokens * 4
 
 var modelToApi = map[string]string{
@@ -64,9 +64,11 @@ var modelToApi = map[string]string{
 	"babbage":                "completion",
 	"ada":                    "completion",
 	"gpt-4":                  "chat",
+	"gpt-4-1106-preview":     "chat",
 	"gpt-4-0613":             "chat",
 	"gpt-4-32k":              "chat",
 	"gpt-4-32k-0613":         "chat",
+	"gpt-3.5-turbo-1106":     "chat",
 	"gpt-3.5-turbo":          "chat",
 	"gpt-3.5-turbo-0613":     "chat",
 	"gpt-3.5-turbo-16k":      "chat",
@@ -78,7 +80,9 @@ func main() {
 	onlyShowPrompt := flag.Bool("only-prompt", false, "When set, only show the prompt and exit")
 	gitMessageTemplate := flag.String("git-message-template", "", "Git commit message template")
 	version := flag.Bool("version", false, "Print version and exit")
-	model := flag.String("model", "gpt-3.5-turbo", "model to use")
+	model := flag.String("model", "gpt-3.5-turbo-1106", "model to use")
+	existingCommitMsgPath := flag.String("commit-msg-path", "", "the original commit message file, we use this to check for merge commits")
+	linesOfDiffContext := flag.Int("context-lines", 0, "number of lines of context to include around changed lines in the diff")
 
 	flag.Parse()
 
@@ -101,7 +105,7 @@ func main() {
 		return
 	}
 
-	gitDiff, err := getGitDiff()
+	gitDiff, err := getGitDiff(*linesOfDiffContext)
 	if err != nil {
 		log.Fatalf("%s", err)
 	}
@@ -109,6 +113,28 @@ func main() {
 	if len(gitDiff) == 0 {
 		fmt.Println("No changes to commit")
 		os.Exit(1)
+	}
+
+	if *existingCommitMsgPath != "" {
+		commitMsgBytes, err := os.ReadFile(*existingCommitMsgPath)
+		if err != nil {
+			log.Fatalf("failed to read commit message file: %s", err)
+		}
+
+		commitMsg := string(commitMsgBytes)
+
+		// Check for common commit message prefixes
+		if strings.HasPrefix(commitMsg, "Merge branch") ||
+			strings.HasPrefix(commitMsg, "Merge pull request") ||
+			strings.HasPrefix(commitMsg, "Revert") ||
+			strings.HasPrefix(commitMsg, "Create") ||
+			strings.HasPrefix(commitMsg, "Update") ||
+			strings.HasPrefix(commitMsg, "Delete") ||
+			strings.HasPrefix(commitMsg, "Initial commit") ||
+			strings.HasPrefix(commitMsg, "Release") {
+			fmt.Println(commitMsg)
+			os.Exit(1)
+		}
 	}
 
 	gitBranch, err := getGitBranch()
@@ -224,7 +250,8 @@ Use the following git diff as a reference:
 
 		prompt.Add(PromptSegment{
 			Content: `
-Focus mainly on lines that start with a + sign. All other lines are only for context.`,
+Focus mainly on lines that start with a + sign. All other lines are only for context.
+Please output the message below:`,
 		})
 	}
 
