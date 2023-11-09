@@ -96,7 +96,7 @@ func main() {
 	}
 
 	if *version {
-		fmt.Println("aigitmsg v0.1.3")
+		fmt.Println("aigitmsg v0.1.4")
 		return
 	}
 
@@ -181,7 +181,16 @@ func main() {
 			log.Fatal(err)
 		}
 
-		fmt.Println(strings.TrimSpace(resp.Choices[0].Message.Content))
+		responseText := strings.TrimSpace(resp.Choices[0].Message.Content)
+		lines := strings.Split(responseText, "\n")
+		if strings.HasPrefix(lines[0], "```") {
+			lines = lines[1:]
+		}
+		if strings.HasSuffix(lines[len(lines)-1], "```") {
+			lines = lines[:len(lines)-1]
+		}
+		responseText = strings.Join(lines, "\n")
+		fmt.Println(responseText)
 	} else if apiMethod == "completion" {
 		req := gogpt.CompletionRequest{
 			Model:       *model,
@@ -195,7 +204,16 @@ func main() {
 			log.Fatal(err)
 		}
 
-		fmt.Println(strings.TrimSpace(resp.Choices[0].Text))
+		responseText := strings.TrimSpace(resp.Choices[0].Text)
+		lines := strings.Split(responseText, "\n")
+		if strings.HasPrefix(lines[0], "```") {
+			lines = lines[1:]
+		}
+		if strings.HasSuffix(lines[len(lines)-1], "```") {
+			lines = lines[:len(lines)-1]
+		}
+		responseText = strings.Join(lines, "\n")
+		fmt.Println(responseText)
 	}
 }
 
