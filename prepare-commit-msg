@@ -1,4 +1,22 @@
-#!/bin/bash
+#!/bin/sh
+
+# Load the user's profile if found, supporting common shells
+if [ -f ~/.bash_profile ]; then
+  . ~/.bash_profile
+elif [ -f ~/.bashrc ]; then
+  . ~/.bashrc
+elif [ -f ~/.zshrc ]; then
+  . ~/.zshrc
+elif [ -f ~/.profile ]; then
+  . ~/.profile
+fi
+
+# load the user's environment variables if found
+if [ -f ~/.bash_env ]; then
+  . ~/.bash_env
+elif [ -f ~/.zshenv ]; then
+  . ~/.zshenv
+fi
 
 COMMIT_MSG_FILE=$1
 
@@ -10,4 +28,7 @@ if [ -z "$OPENAI_API_KEY" ]; then
 fi
 
 # Call the aigitmsg binary with the GPT API Key as an argument
-aigitmsg --gpt-key "$OPENAI_API_KEY" > "$COMMIT_MSG_FILE"
+aigitmsg --gpt-key "$OPENAI_API_KEY" --context-lines 5 --commit-msg-path "$COMMIT_MSG_FILE" > "$COMMIT_MSG_FILE"
+
+# Open the file in the configured editor for review
+${EDITOR:-nano} "$COMMIT_MSG_FILE"
