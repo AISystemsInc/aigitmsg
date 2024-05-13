@@ -20,11 +20,15 @@ go install github.com/AISystemsInc/aigitmsg/aigitmsg@latest
 
 ## Usage
 
-1. Run `aigitmsg -gpt-key <api-key>` from the root of your repository
-   - If you configure the `OPENAI_API_KEY` environment variable, you can omit the `-gpt-key` flag
-2. Receive a meaningful commit message
+1. Run `aigitmsg` with the necessary flags from the root of your repository:
+   - `-gpt-key <api-key>`: Specify the OpenAI API key. If the `OPENAI_API_KEY` environment variable is set, this flag can be omitted.
+   - `-model <model>`: (Optional) Specify the model to use. Default is `gpt-3.5-turbo-1106`.
+   - `-context-lines <number>`: (Optional) Set the number of context lines to include around changed lines in the diff.
+   - `-only-prompt`: (Optional) When set, only the prompt will be shown and the program will exit.
+   - `-git-message-template <template>`: (Optional) Specify a git commit message template.
+   - `-commit-msg-path <path>`: (Optional) Specify the path to the original commit message file to check for merge commits.
 
-You can optionally set the `-model <model>` flag to use different models.
+2. The tool will generate a meaningful commit message based on the provided inputs and configurations.
 
 ## Installing as a Git Hook
 
