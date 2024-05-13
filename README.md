@@ -20,41 +20,15 @@ go install github.com/AISystemsInc/aigitmsg/aigitmsg@latest
 
 ## Usage
 
-1. Run `aigitmsg -gpt-key <api-key>` from the root of your repository
-   - If you configure the `OPENAI_API_KEY` environment variable, you can omit the `-gpt-key` flag
-2. Receive a meaningful commit message
+1. Run `aigitmsg` with the necessary flags from the root of your repository:
+   - `-gpt-key <api-key>`: Specify the OpenAI API key. If the `OPENAI_API_KEY` environment variable is set, this flag can be omitted.
+   - `-model <model>`: (Optional) Specify the model to use. Default is `gpt-3.5-turbo-1106`.
+   - `-context-lines <number>`: (Optional) Set the number of context lines to include around changed lines in the diff.
+   - `-only-prompt`: (Optional) When set, only the prompt will be shown and the program will exit.
+   - `-git-message-template <template>`: (Optional) Specify a git commit message template.
+   - `-commit-msg-path <path>`: (Optional) Specify the path to the original commit message file to check for merge commits.
 
-You can optionally set the `-model <model>` flag to use more capable models.
-
-Valid models are:
- - `text-davinci-003`
- - `text-davinci-002`
- - `text-davinci-001`
- - `text-curie-001`
- - `text-babbage-001`
- - `text-ada-001`
- - `davinci`
- - `curie`
- - `babbage`
- - `ada`
- - `gpt-4`
- - `gpt-4-1106-preview`
- - `gpt-4-0613`
- - `gpt-4-32k`
- - `gpt-4-32k-0613`
- - `gpt-3.5-turbo-1106` **default**
- - `gpt-3.5-turbo`
- - `gpt-3.5-turbo-0613`
- - `gpt-3.5-turbo-16k`
- - `gpt-3.5-turbo-16k-0613`
-
-## Getting a GPT-3 API Key
-
-In order to use the aigitmsg tool, you will need to obtain a GPT-3 API key. You can get your API key by signing up 
-for an account at [OpenAI](https://openai.com/). Once you have an account, you can find your API key in the 
-Developer Settings section of your account.
-
-Once you have your API key, you can use it with the `-gpt-key` flag when running the `aigitmsg` tool.
+2. The tool will generate a meaningful commit message based on the provided inputs and configurations.
 
 ## Installing as a Git Hook
 
