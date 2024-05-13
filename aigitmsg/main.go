@@ -52,29 +52,6 @@ const maxCompletionTokens = 500
 const maxAllowedTokens = 4096
 const maxPromptLength = maxAllowedTokens * 4
 
-var modelToApi = map[string]string{
-	"text-davinci-003":       "completion",
-	"text-davinci-002":       "completion",
-	"text-davinci-001":       "completion",
-	"text-curie-001":         "completion",
-	"text-babbage-001":       "completion",
-	"text-ada-001":           "completion",
-	"davinci":                "completion",
-	"curie":                  "completion",
-	"babbage":                "completion",
-	"ada":                    "completion",
-	"gpt-4":                  "chat",
-	"gpt-4-1106-preview":     "chat",
-	"gpt-4-0613":             "chat",
-	"gpt-4-32k":              "chat",
-	"gpt-4-32k-0613":         "chat",
-	"gpt-3.5-turbo-1106":     "chat",
-	"gpt-3.5-turbo":          "chat",
-	"gpt-3.5-turbo-0613":     "chat",
-	"gpt-3.5-turbo-16k":      "chat",
-	"gpt-3.5-turbo-16k-0613": "chat",
-}
-
 func main() {
 	gptAPIKey := flag.String("gpt-key", os.Getenv("OPENAI_API_KEY"), "OPENAI API Key")
 	onlyShowPrompt := flag.Bool("only-prompt", false, "When set, only show the prompt and exit")
@@ -85,15 +62,6 @@ func main() {
 	linesOfDiffContext := flag.Int("context-lines", 0, "number of lines of context to include around changed lines in the diff")
 
 	flag.Parse()
-
-	apiMethod := "completion"
-
-	if modelToApi[*model] != "" {
-		apiMethod = modelToApi[*model]
-	} else {
-		fmt.Printf("Unknown model: %s\n", *model)
-		os.Exit(1)
-	}
 
 	if *version {
 		fmt.Println("aigitmsg v0.1.4")
@@ -159,62 +127,48 @@ func main() {
 	}
 
 	c := gogpt.NewClient(*gptAPIKey)
+
+	models := listAvailableModels(c)
+	if err != nil {
+		log.Fatalf("failed to list models: %s", err)
+	}
+
+	if _, ok := models[*model]; !ok {
+		fmt.Printf("Unknown model: %s\n", *model)
+		os.Exit(1)
+	}
+
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*30)
 
 	defer cancel()
 
-	if apiMethod == "chat" {
-		req := gogpt.ChatCompletionRequest{
-			Model:     *model,
-			MaxTokens: maxCompletionTokens,
-			Messages: []gogpt.ChatCompletionMessage{
-				{
-					Role:    "system",
-					Content: prompt,
-				},
+	req := gogpt.ChatCompletionRequest{
+		Model:     *model,
+		MaxTokens: maxCompletionTokens,
+		Messages: []gogpt.ChatCompletionMessage{
+			{
+				Role:    "system",
+				Content: prompt,
 			},
-			Temperature: 0.9,
-		}
-
-		resp, err := c.CreateChatCompletion(ctx, req)
-		if err != nil {
-			log.Fatal(err)
-		}
-
-		responseText := strings.TrimSpace(resp.Choices[0].Message.Content)
-		lines := strings.Split(responseText, "\n")
-		if strings.HasPrefix(lines[0], "```") {
-			lines = lines[1:]
-		}
-		if strings.HasSuffix(lines[len(lines)-1], "```") {
-			lines = lines[:len(lines)-1]
-		}
-		responseText = strings.Join(lines, "\n")
-		fmt.Println(responseText)
-	} else if apiMethod == "completion" {
-		req := gogpt.CompletionRequest{
-			Model:       *model,
-			MaxTokens:   maxCompletionTokens,
-			Prompt:      prompt,
-			Temperature: 0.9,
-		}
-
-		resp, err := c.CreateCompletion(ctx, req)
-		if err != nil {
-			log.Fatal(err)
-		}
-
-		responseText := strings.TrimSpace(resp.Choices[0].Text)
-		lines := strings.Split(responseText, "\n")
-		if strings.HasPrefix(lines[0], "```") {
-			lines = lines[1:]
-		}
-		if strings.HasSuffix(lines[len(lines)-1], "```") {
-			lines = lines[:len(lines)-1]
-		}
-		responseText = strings.Join(lines, "\n")
-		fmt.Println(responseText)
+		},
+		Temperature: 0.9,
 	}
+
+	resp, err := c.CreateChatCompletion(ctx, req)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	responseText := strings.TrimSpace(resp.Choices[0].Message.Content)
+	lines := strings.Split(responseText, "\n")
+	if strings.HasPrefix(lines[0], "```") {
+		lines = lines[1:]
+	}
+	if strings.HasSuffix(lines[len(lines)-1], "```") {
+		lines = lines[:len(lines)-1]
+	}
+	responseText = strings.Join(lines, "\n")
+	fmt.Println(responseText)
 }
 
 func buildPrompt(gitDiff, gitBranch, gitTemplate string) string {
@@ -331,4 +285,20 @@ func (p *Prompt) String() string {
 	}
 
 	return prompt
+}
+
+func listAvailableModels(client *gogpt.Client) map[string]struct{} {
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*30)
+	defer cancel()
+
+	models, err := client.ListModels(ctx)
+	if err != nil {
+		log.Fatalf("failed to list models: %s", err)
+	}
+
+	modelNames := make(map[string]struct{})
+	for _, model := range models.Models {
+		modelNames[model.ID] = struct{}{}
+	}
+	return modelNames
 }
